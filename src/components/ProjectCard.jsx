@@ -1,9 +1,9 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Calendar, Layers, ExternalLink, Edit2, Trash2 } from "lucide-react";
+import { Calendar, Layers, ExternalLink } from "lucide-react";
 import { FaGithub } from "react-icons/fa";
 
-export default function ProjectCard({ project, isAdmin, onEdit, onDelete }) {
+export default function ProjectCard({ project }) {
   // Format date helper
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -103,25 +103,7 @@ export default function ProjectCard({ project, isAdmin, onEdit, onDelete }) {
           </Link>
         </div>
 
-        {/* Admin Actions */}
-        {isAdmin && (
-          <div className="flex items-center gap-3 pt-3 border-t border-white/5">
-            <button
-              onClick={() => onEdit(project)}
-              className="flex-1 py-2 px-3 bg-neutral-900 hover:bg-neutral-800 border border-white/10 hover:border-white/20 rounded-xl text-neutral-300 hover:text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <Edit2 className="w-3.5 h-3.5" />
-              Edit
-            </button>
-            <button
-              onClick={() => onDelete(project.id)}
-              className="flex-1 py-2 px-3 bg-brand-red/10 hover:bg-brand-red border border-brand-red/20 hover:border-brand-red rounded-xl text-brand-red hover:text-white text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              Delete
-            </button>
-          </div>
-        )}
+
       </div>
     </motion.div>
   );

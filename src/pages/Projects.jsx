@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, Unlock, FolderGit, AlertCircle, Plus } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import SearchBar from "../components/SearchBar";
 import CategoryFilter from "../components/CategoryFilter";
 import ProjectCard from "../components/ProjectCard";
-import UploadProjectForm from "../components/UploadProjectForm";
+
 import { seedProjects } from "../utils/seedData";
 
 // Pre-generate pseudo-random stars deterministically outside the component for React 19 purity rules
@@ -33,9 +33,7 @@ export default function Projects() {
     return seedProjects;
   });
 
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showUploadForm, setShowUploadForm] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
+
 
   // Search, Filter, Sort, Pagination states
   const [searchQuery, setSearchQuery] = useState("");
@@ -104,53 +102,7 @@ export default function Projects() {
     setCurrentPage(1);
   };
 
-  const saveProjects = (updatedList) => {
-    localStorage.setItem("gis_portfolio_projects", JSON.stringify(updatedList));
-    setProjects(updatedList);
-  };
 
-  const handleSaveProject = (savedProject) => {
-    const exists = projects.find((p) => p.id === savedProject.id);
-    let updatedList;
-    if (exists) {
-      updatedList = projects.map((p) => (p.id === savedProject.id ? savedProject : p));
-    } else {
-      updatedList = [savedProject, ...projects];
-    }
-    saveProjects(updatedList);
-    setEditingProject(null);
-    setShowUploadForm(false);
-  };
-
-  const handleDeleteProject = (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this project?");
-    if (confirmDelete) {
-      const updatedList = projects.filter((p) => p.id !== id);
-      saveProjects(updatedList);
-      // Reset editing if the deleted project was open
-      if (editingProject && editingProject.id === id) {
-        setEditingProject(null);
-        setShowUploadForm(false);
-      }
-    }
-  };
-
-  const handleEditClick = (project) => {
-    setEditingProject(project);
-    setShowUploadForm(true);
-    // Scroll to form smoothly
-    window.scrollTo({ top: 300, behavior: "smooth" });
-  };
-
-  const handleCancelForm = () => {
-    setEditingProject(null);
-    setShowUploadForm(false);
-  };
-
-  const handleOpenUpload = () => {
-    setEditingProject(null);
-    setShowUploadForm(true);
-  };
 
   // Filter & Sort Projects logic
   const filteredProjects = projects
@@ -237,84 +189,10 @@ export default function Projects() {
             </p>
           </div>
 
-          {/* Admin Toggle Switch */}
-          <div className="shrink-0 flex items-center gap-3">
-            <button
-              onClick={() => {
-                setIsAdmin(!isAdmin);
-                setShowUploadForm(false);
-                setEditingProject(null);
-              }}
-              className={`p-3 border rounded-xl flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest transition-all cursor-pointer ${
-                isAdmin
-                  ? "bg-brand-red border-brand-red text-white shadow-[0_0_15px_rgba(255,42,42,0.25)]"
-                  : "bg-white/5 border-white/10 text-neutral-400 hover:text-white"
-              }`}
-              title={isAdmin ? "Disable Admin Panel" : "Activate Admin Panel"}
-            >
-              {isAdmin ? (
-                <>
-                  <Unlock className="w-4 h-4 text-white" />
-                  <span>Admin Mode Active</span>
-                </>
-              ) : (
-                <>
-                  <Lock className="w-4 h-4 text-neutral-400" />
-                  <span>Admin Panel</span>
-                </>
-              )}
-            </button>
-          </div>
+
         </div>
 
-        {/* Upload form container (shown only to admin) */}
-        <AnimatePresence>
-          {isAdmin && showUploadForm && (
-            <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="mb-12"
-            >
-              <UploadProjectForm
-                key={editingProject?.id || "new"}
-                editingProject={editingProject}
-                onSave={handleSaveProject}
-                onCancel={handleCancelForm}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
 
-        {/* Admin Dashboard summary / Add project shortcut */}
-        {isAdmin && !showUploadForm && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="p-6 border border-dashed border-white/15 hover:border-brand-red/40 bg-[#0c0c0c] rounded-3xl mb-12 flex flex-col md:flex-row items-center justify-between gap-6"
-          >
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-neutral-900 border border-white/5 rounded-2xl text-brand-red">
-                <FolderGit className="w-6 h-6" />
-              </div>
-              <div className="text-left">
-                <h4 className="font-bold text-white tracking-wide text-sm font-outfit uppercase">
-                  Project Workspace Management
-                </h4>
-                <p className="text-neutral-500 text-xs font-light mt-1">
-                  You can upload new GIS maps or edit existing case studies stored in local storage.
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={handleOpenUpload}
-              className="w-full md:w-auto px-6 py-3 bg-brand-red hover:bg-brand-red/90 text-white font-bold text-xs uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-brand-red/10"
-            >
-              <Plus className="w-4 h-4" />
-              Add Project Case Study
-            </button>
-          </motion.div>
-        )}
 
         {/* Search, Filter & Sort Controls */}
         <div className="space-y-6 mb-12 bg-neutral-950/40 border border-white/5 rounded-3xl p-6 backdrop-blur-md">
@@ -334,9 +212,6 @@ export default function Projects() {
               <ProjectCard
                 key={project.id}
                 project={project}
-                isAdmin={isAdmin}
-                onEdit={handleEditClick}
-                onDelete={handleDeleteProject}
               />
             ))}
           </AnimatePresence>
@@ -354,7 +229,7 @@ export default function Projects() {
               No Projects Found
             </h3>
             <p className="text-neutral-500 text-xs mt-2 max-w-sm font-light">
-              Try adjusting your search keywords, checking other category filters, or click the Admin Panel to upload a custom project.
+              Try adjusting your search keywords or checking other category filters.
             </p>
           </motion.div>
         )}
