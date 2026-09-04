@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Play, Pause, ChevronDown, X, Volume2, VolumeX } from "lucide-react";
+import { Play, Pause, ChevronDown, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import image1 from "../assets/image1.png";
 import image2 from "../assets/image2.png";
@@ -10,9 +10,7 @@ export default function Hero() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showReel, setShowReel] = useState(false);
   const [reelSpeechIndex, setReelSpeechIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef(null);
-  const synthRef = useRef(null);
 
   const speechText = [
     "Hi, I'm BADAL MAHATA.",
@@ -60,53 +58,11 @@ export default function Hero() {
     }
   };
 
-  // Run reel subtitle updates and voiceover speech
+  // Cycle through reel sentences automatically
   useEffect(() => {
     let interval;
     if (showReel) {
       setReelSpeechIndex(0);
-
-      // Start reading speech
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-
-        const fullSpeech = speechText.join(" ");
-        const utterance = new SpeechSynthesisUtterance(fullSpeech);
-        utterance.rate = 0.95;
-        utterance.pitch = 1.0;
-        utterance.volume = isMuted ? 0 : 1;
-
-        // Find a premium male English voice if possible
-        const voices = window.speechSynthesis.getVoices();
-        const selectedVoice = voices.find(v => v.lang.includes("en-US") && v.name.toLowerCase().includes("natural"))
-          || voices.find(v => v.lang.includes("en"))
-          || voices[0];
-
-        if (selectedVoice) utterance.voice = selectedVoice;
-
-        utterance.onboundary = (event) => {
-          if (event.name === "sentence" || event.name === "word") {
-            // Estimate which sentence we are on based on character index
-            let charAccumulator = 0;
-            for (let i = 0; i < speechText.length; i++) {
-              charAccumulator += speechText[i].length + 1; // +1 for space
-              if (event.charIndex < charAccumulator) {
-                setReelSpeechIndex(i);
-                break;
-              }
-            }
-          }
-        };
-
-        utterance.onend = () => {
-          handleCloseReel();
-        };
-
-        synthRef.current = utterance;
-        window.speechSynthesis.speak(utterance);
-      }
-
-      // Fallback timer just in case speech synthesis is not supported or fails to update sentences
       let currentSentence = 0;
       interval = setInterval(() => {
         if (currentSentence < speechText.length - 1) {
@@ -114,54 +70,12 @@ export default function Hero() {
           setReelSpeechIndex(currentSentence);
         } else {
           clearInterval(interval);
+          handleCloseReel();
         }
       }, 7000);
     }
-
-    return () => {
-      clearInterval(interval);
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, [showReel, isMuted]);
-
-  // Adjust volume output of speech synthesis when mute state changes
-  useEffect(() => {
-    if (showReel && synthRef.current && window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      const currentIdx = reelSpeechIndex;
-      const remainingSpeech = speechText.slice(currentIdx).join(" ");
-      const utterance = new SpeechSynthesisUtterance(remainingSpeech);
-      utterance.rate = 0.95;
-      utterance.volume = isMuted ? 0 : 1;
-
-      const voices = window.speechSynthesis.getVoices();
-      const selectedVoice = voices.find(v => v.lang.includes("en-US") && v.name.toLowerCase().includes("natural"))
-        || voices.find(v => v.lang.includes("en"))
-        || voices[0];
-      if (selectedVoice) utterance.voice = selectedVoice;
-
-      utterance.onboundary = (event) => {
-        let charAccumulator = 0;
-        const currentSentenceList = speechText.slice(currentIdx);
-        for (let i = 0; i < currentSentenceList.length; i++) {
-          charAccumulator += currentSentenceList[i].length + 1;
-          if (event.charIndex < charAccumulator) {
-            setReelSpeechIndex(currentIdx + i);
-            break;
-          }
-        }
-      };
-
-      utterance.onend = () => {
-        handleCloseReel();
-      };
-
-      synthRef.current = utterance;
-      window.speechSynthesis.speak(utterance);
-    }
-  }, [isMuted]);
+    return () => clearInterval(interval);
+  }, [showReel]);
 
   // Handle smooth scroll to about section
   const handleScrollToAbout = () => {
@@ -260,32 +174,7 @@ export default function Hero() {
             transition={{ duration: 1, ease: "easeOut" }}
             className="relative flex flex-col items-center group"
           >
-            {/* Play Reel Trigger */}
-            <button
-              onClick={handleOpenReel}
-              className="w-40 h-40 md:w-56 md:h-56 rounded-full border-2 border-white/30 bg-white/5 backdrop-blur-md flex items-center justify-center transition-all duration-500 hover:scale-105 hover:border-brand-red hover:shadow-[0_0_40px_rgba(255,42,42,0.4)] group cursor-pointer"
-            >
-              <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-brand-red flex items-center justify-center text-white transition-all duration-300 group-hover:scale-110">
-                <Play fill="white" size={24} className="ml-1 text-white" />
-              </div>
-            </button>
-            <span className="text-xs uppercase tracking-widest text-white/50 group-hover:text-white mt-4 transition-colors font-semibold font-outfit">
-              PLAY REEL
-            </span>
 
-            {/* Custom Control button for background video */}
-            <div className="absolute -bottom-16 flex items-center gap-3">
-              <button
-                onClick={handlePlayPause}
-                className="p-2.5 rounded-full bg-black/50 border border-white/10 text-white/70 hover:text-white hover:border-white transition-all"
-                title={isPlaying ? "Pause background" : "Play background"}
-              >
-                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
-              </button>
-              <span className="text-[10px] text-white/40 tracking-wider uppercase font-mono">
-                BG: {isPlaying ? "SPINNING" : "PAUSED"}
-              </span>
-            </div>
           </motion.div>
         </div>
       </div>
@@ -316,21 +205,12 @@ export default function Hero() {
                 <span className="w-2.5 h-2.5 rounded-full bg-brand-red animate-ping" />
                 Live Animated Showreel
               </span>
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => setIsMuted(!isMuted)}
-                  className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all flex items-center justify-center"
-                  title={isMuted ? "Unmute Speech" : "Mute Speech"}
-                >
-                  {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                </button>
-                <button
+              <button
                   onClick={handleCloseReel}
                   className="p-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all flex items-center justify-center"
                 >
                   <X size={18} />
                 </button>
-              </div>
             </div>
 
             {/* Video Content Screen */}
@@ -354,24 +234,7 @@ export default function Hero() {
 
               {/* Subtitles Overlay */}
               <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8 bg-gradient-to-t from-black/90 via-black/50 to-transparent flex flex-col items-center text-center">
-                {/* Audio voice waves indicator */}
-                <div className="flex items-center gap-1.5 justify-center mb-4">
-                  {[...Array(6)].map((_, i) => (
-                    <motion.span
-                      key={i}
-                      className="w-1 h-3 md:h-5 bg-brand-red rounded-full"
-                      animate={{
-                        scaleY: isMuted ? 0.3 : [1, 2.5, 1],
-                        opacity: isMuted ? 0.4 : [0.6, 1, 0.6]
-                      }}
-                      transition={{
-                        duration: 0.6 + i * 0.1,
-                        repeat: Infinity,
-                        ease: "easeInOut"
-                      }}
-                    />
-                  ))}
-                </div>
+
 
                 {/* Live Caption Text */}
                 <motion.p
