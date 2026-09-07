@@ -122,5 +122,38 @@ export const seedProjects = [
     ],
     challenges: "Separating geologically similar but risk-distinct zones in steep terrain where slope, aspect, and lithology change rapidly within short distances. This was addressed by incorporating curvature and lineament density as supplementary discriminatory factors, and cross-validating the output against historical landslide event locations.",
     results: "The risk zonation map reveals that approximately 25–30% of South Sikkim falls under High to Very High landslide risk categories, predominantly in the northern and central belt. The map has been used to guide infrastructure planning, identify vulnerable road corridors, and support disaster preparedness initiatives by the State Disaster Management Authority (SDMA)."
+  },
+  {
+    id: "seed-dem-kanshabati",
+    title: "Suitable DEM Site Selection – Kanshabati River Basin",
+    shortDesc: "GIS and remote sensing-based multi-criteria spatial analysis to identify and prioritize the best suitable locations for DEM creation in the Kanshabati River Basin, West Bengal, using weighted overlay and MCDM techniques.",
+    fullDesc: "The Kanshabati River Basin is a complex drainage system in the western part of West Bengal, characterized by dense stream networks, variable topography, and a mix of agricultural and forested landscapes. This project applies a GIS-based Multi-Criteria Decision-Making (MCDM) approach to identify the most suitable sites for Digital Elevation Model (DEM) creation within the basin. Nine spatial criteria were integrated: Rainfall, Geomorphology, Lineament Density, Land Use/Land Cover (LULC), Soil Texture, Slope, Stream Order, Stream Power Index (SPI), and Distance to Settlement. Each criterion was reclassified into a standardized suitability scale, assigned an appropriate weight reflecting its relative importance, and combined through a Weighted Overlay analysis. The resulting Suitability Index was classified into five categories — Not Suitable, Low Suitable, Moderate Suitable, High Suitable, and Very High Suitable — across the basin extent (approximately 22°56′50″N–23°33′20″N and 86°02′40″E–86°39′10″E). Several priority locations, marked as Best Suitable sites, were identified in high and very-high suitability zones for field verification and future DEM development. The analysis clearly reveals considerable spatial variation in DEM suitability, with Very High Suitable zones predominantly in the southern and eastern portions of the basin. The project demonstrates how integrated GIS, remote sensing, and MCDM methodologies can effectively support terrain analysis, watershed management, hydrological modelling, and flood-risk assessment planning.",
+    tech: ["ArcGIS", "QGIS", "Remote Sensing", "MCDM / AHP", "Weighted Overlay", "Raster Analysis", "DEM Processing"],
+    category: "GIS",
+    date: "2026-09-01",
+    featured: true,
+    image: "/dem_kanshabati.jpg",
+    screenshots: [
+      "/dem_kanshabati.jpg"
+    ],
+    workflow: [
+      "Delineation of the Kanshabati River Basin boundary and extraction of the full drainage network using DEM-based hydrological tools",
+      "Preparation of nine thematic suitability criteria layers: Rainfall, Geomorphology, Lineament Density, LULC, Soil Texture, Slope, Stream Order, SPI, and Distance to Settlement",
+      "Reclassification and standardization of each thematic layer into a uniform suitability score scale",
+      "Assignment of criterion weights using Analytic Hierarchy Process (AHP) / MCDM pairwise comparison matrix",
+      "Weighted Overlay analysis to generate the composite Suitability Index raster across the basin",
+      "Classification of the Suitability Index into five classes: Not Suitable, Low Suitable, Moderate Suitable, High Suitable, and Very High Suitable",
+      "Identification and cartographic marking of Best Suitable locations for DEM creation based on highest suitability scores"
+    ],
+    features: [
+      "Nine-criteria MCDM suitability framework integrating hydrological, geological, and land-cover parameters",
+      "Five-class spatial suitability map with clear visual differentiation using a green-to-red colour ramp",
+      "Stream Power Index (SPI) integration to capture erosive flow concentration hotspots",
+      "Best Suitable site points marked for direct field verification and planning use",
+      "Inset location maps showing Kanshabati River Basin extent within West Bengal boundary context",
+      "Applicable for watershed management, hydrological modelling, and flood-risk assessment"
+    ],
+    challenges: "Integrating nine heterogeneous thematic layers with different data types, resolutions, and projection systems into a single comparable suitability framework. This was resolved by rigorous reclassification and standardization of each layer into a uniform scale, followed by consistency ratio validation of the AHP weight matrix to ensure logical criterion prioritization.",
+    results: "The GIS-based MCDM analysis successfully produced a DEM site suitability map for the Kanshabati River Basin. Significant spatial variation in suitability was identified across the basin. Very High Suitable (red) zones are concentrated in the southern and eastern portions of the basin. Several priority Best Suitable locations were identified and marked across the basin for future DEM development and field verification. The suitability framework provides a replicable model for terrain analysis and site selection in comparable river basin environments."
   }
 ];
